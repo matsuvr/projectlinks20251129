@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # testing
 /coverage
@@ -14,6 +17,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -27,6 +31,9 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.development
+.env.production
+.env.test
 
 # vercel
 .vercel
@@ -34,3 +41,76 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Secrets and credentials (IMPORTANT for public repos)
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+*_secret*
+*.secret
+service-account*.json
+firebase-adminsdk*.json
+
+# API keys and tokens
+api_key.*
+api-key.*
+*.token
+*_token.*
+auth_token*
+access_token*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Python (if used)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+ENV/
+
+# Java (if used)
+*.class
+*.jar
+*.war
+target/
+
+# Go (if used)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
