@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { Plus, Minus, Locate } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Station } from "@/lib/stations"
@@ -77,9 +77,14 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
     [zoom, center],
   )
 
-  // Generate GSI tile URL
+  // Generate GSI tile URL (標準地図)
   const getTileUrl = (x: number, y: number, z: number) => {
     return `https://cyberjapandata.gsi.go.jp/xyz/std/${z}/${x}/${y}.png`
+  }
+
+  // Generate GSI relief tile URL (色別標高図)
+  const getReliefTileUrl = (x: number, y: number, z: number) => {
+    return `https://cyberjapandata.gsi.go.jp/xyz/relief/${z}/${x}/${y}.png`
   }
 
   // Handle mouse/touch events for dragging
@@ -199,16 +204,33 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
     setZoom(INITIAL_ZOOM)
   }
 
-  // Calculate visible tiles
-  const [tiles, setTiles] = useState<
-    Array<{ x: number; y: number; z: number; url: string; left: number; top: number }>
-  >([])
+  // マップサイズを追跡するstate
+  const [mapSize, setMapSize] = useState({ width: 0, height: 0 })
 
+  // マップサイズの更新
   useEffect(() => {
     if (!mapRef.current) return
+    
+    const updateSize = () => {
+      if (mapRef.current) {
+        setMapSize({
+          width: mapRef.current.offsetWidth,
+          height: mapRef.current.offsetHeight,
+        })
+      }
+    }
+    
+    updateSize()
+    const resizeObserver = new ResizeObserver(updateSize)
+    resizeObserver.observe(mapRef.current)
+    
+    return () => resizeObserver.disconnect()
+  }, [])
 
-    const mapWidth = mapRef.current.offsetWidth
-    const mapHeight = mapRef.current.offsetHeight
+  // Calculate visible tiles using useMemo
+  const tiles = useMemo(() => {
+    if (mapSize.width === 0 || mapSize.height === 0) return []
+
     const scale = Math.pow(2, zoom)
 
     const centerTileX = Math.floor(((center.lng + 180) / 360) * scale)
@@ -218,10 +240,10 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
         scale,
     )
 
-    const tilesX = Math.ceil(mapWidth / 256) + 2
-    const tilesY = Math.ceil(mapHeight / 256) + 2
+    const tilesX = Math.ceil(mapSize.width / 256) + 2
+    const tilesY = Math.ceil(mapSize.height / 256) + 2
 
-    const newTiles: typeof tiles = []
+    const newTiles: Array<{ x: number; y: number; z: number; url: string; left: number; top: number }> = []
 
     for (let dx = -Math.floor(tilesX / 2); dx <= Math.ceil(tilesX / 2); dx++) {
       for (let dy = -Math.floor(tilesY / 2); dy <= Math.ceil(tilesY / 2); dy++) {
@@ -246,35 +268,32 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
           y: tileY,
           z: zoom,
           url: getTileUrl(tileX, tileY, zoom),
-          left: tileWorldX - centerWorldX + mapWidth / 2,
-          top: tileWorldY - centerWorldY + mapHeight / 2,
+          left: tileWorldX - centerWorldX + mapSize.width / 2,
+          top: tileWorldY - centerWorldY + mapSize.height / 2,
         })
       }
     }
 
-    setTiles(newTiles)
-  }, [center, zoom])
+    return newTiles
+  }, [center, zoom, mapSize])
 
-  // Calculate station positions
-  const [stationPositions, setStationPositions] = useState<Array<{ station: Station; x: number; y: number }>>([])
+  // Calculate station positions using useMemo
+  const stationPositions = useMemo(() => {
+    if (mapSize.width === 0 || mapSize.height === 0) return []
 
-  useEffect(() => {
-    if (!mapRef.current) return
-
-    const mapWidth = mapRef.current.offsetWidth
-    const mapHeight = mapRef.current.offsetHeight
-
-    const positions = stations.map((station) => {
-      const { x, y } = latLngToPixel(station.lat, station.lng, mapWidth, mapHeight)
+    return stations.map((station) => {
+      const { x, y } = latLngToPixel(station.lat, station.lng, mapSize.width, mapSize.height)
       return { station, x, y }
     })
+  }, [stations, latLngToPixel, mapSize])
 
-    setStationPositions(positions)
-  }, [stations, center, zoom, latLngToPixel])
-
-  // Center on selected station
+  // Center on selected station - ユーザーの駅選択イベントに応答して地図を移動
+  // これは外部イベント（ユーザー操作）への応答なので、useEffect内でsetStateが必要
+  const prevSelectedStationRef = useRef<Station | null>(null)
   useEffect(() => {
-    if (selectedStation) {
+    if (selectedStation && selectedStation !== prevSelectedStationRef.current) {
+      prevSelectedStationRef.current = selectedStation
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- ユーザーの駅選択イベントに応答して地図中心を更新
       setCenter({ lat: selectedStation.lat, lng: selectedStation.lng })
     }
   }, [selectedStation])
@@ -296,10 +315,11 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
         onWheel={handleWheel}
         style={{ touchAction: "none" }}
       >
-        {/* Tiles */}
+        {/* Tiles - 標準地図 */}
+        {/* eslint-disable @next/next/no-img-element -- 外部タイルサーバーの動的画像のためimg要素を使用 */}
         {tiles.map((tile) => (
           <img
-            key={`${tile.z}-${tile.x}-${tile.y}`}
+            key={`std-${tile.z}-${tile.x}-${tile.y}`}
             src={tile.url || "/placeholder.svg"}
             alt=""
             className="pointer-events-none absolute h-64 w-64 select-none"
@@ -312,6 +332,27 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
             draggable={false}
           />
         ))}
+        {/* eslint-enable @next/next/no-img-element */}
+
+        {/* Tiles - 色別標高図オーバーレイ (透明度40%) */}
+        {/* eslint-disable @next/next/no-img-element -- 外部タイルサーバーの動的画像のためimg要素を使用 */}
+        {tiles.map((tile) => (
+          <img
+            key={`relief-${tile.z}-${tile.x}-${tile.y}`}
+            src={getReliefTileUrl(tile.x, tile.y, tile.z)}
+            alt=""
+            className="pointer-events-none absolute h-64 w-64 select-none"
+            style={{
+              left: tile.left,
+              top: tile.top,
+              width: 256,
+              height: 256,
+              opacity: 0.4,
+            }}
+            draggable={false}
+          />
+        ))}
+        {/* eslint-enable @next/next/no-img-element */}
 
         {/* Station Markers */}
         {stationPositions.map(({ station, x, y }) => (
