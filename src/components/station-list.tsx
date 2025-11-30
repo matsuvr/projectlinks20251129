@@ -14,7 +14,7 @@ export function StationList({ stations, selectedStation, onStationSelect }: Stat
   return (
     <div className="flex h-full flex-col border-r border-border">
       <div className="border-b border-border p-3 sm:p-4">
-        <h2 className="text-sm sm:text-base font-bold text-foreground">🌅 撮影スポット一覧</h2>
+        <h2 className="text-sm sm:text-base font-bold text-foreground">🌅 東南東にひらけた海岸が近くにある関東の駅</h2>
         <p className="text-xs text-muted-foreground mt-1">地図から駅を探してタップ</p>
       </div>
 

@@ -289,7 +289,7 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
         <div className="mt-1 sm:mt-2 pt-1 sm:pt-2 border-t border-border">
           <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground">
             <span>🌙</span>
-            <span>最終列車あり</span>
+            <span>終電情報あり</span>
           </div>
         </div>
       </div>

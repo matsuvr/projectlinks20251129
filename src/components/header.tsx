@@ -23,7 +23,7 @@ export function Header({ stationCount, onToggleSidebar, isSidebarOpen }: HeaderP
           </div>
           <div>
             <h1 className="text-sm sm:text-lg font-bold text-foreground">初日の出ハンター</h1>
-            <p className="hidden sm:block text-xs text-muted-foreground">日の出撮影スポット駅マップ</p>
+            <p className="hidden sm:block text-xs text-muted-foreground">鉄道で行けるから車なしでも安心</p>
           </div>
         </div>
       </div>

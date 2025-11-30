@@ -6,7 +6,7 @@ import "./globals.css"
 const notoSansJP = Noto_Sans_JP({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "初日の出ハンター | 日の出撮影スポット駅マップ",
+  title: "初日の出ハンター | 東南東にひらけた海岸が近い駅のリスト",
   description:
     "関東地方の日の出撮影に最適な駅を地図上で探索。東京駅から200km以内・沿岸2km以内の駅を、最終電車情報とともにご紹介。国土地理院の地図を使った、カメラマンのための撮影ポイントガイド。",
   keywords: ["初日の出", "撮影スポット", "駅", "関東", "写真", "地図", "カメラ", "最終電車"],
