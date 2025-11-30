@@ -18,7 +18,7 @@ export function StationDetail({ station, isOpen, onClose }: StationDetailProps) 
     <div className="absolute bottom-0 left-0 right-0 z-30 max-h-[70vh] overflow-y-auto md:bottom-4 md:left-auto md:right-4 md:w-96 md:max-h-none">
       <div className="rounded-t-2xl bg-card shadow-2xl md:rounded-2xl">
         {/* Header */}
-        <div className="relative h-20 sm:h-32 overflow-hidden rounded-t-2xl bg-gradient-to-r from-primary/80 to-accent/80 md:rounded-t-2xl">
+        <div className="relative h-20 sm:h-32 overflow-hidden rounded-t-2xl bg-linear-to-r from-primary/80 to-accent/80 md:rounded-t-2xl">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <Sunrise className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-primary-foreground opacity-50" />
@@ -27,7 +27,7 @@ export function StationDetail({ station, isOpen, onClose }: StationDetailProps) 
               </p>
             </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-card to-transparent" />
           <Button
             variant="ghost"
             size="icon"

@@ -35,7 +35,7 @@ export function StationList({ stations, selectedStation, onStationSelect }: Stat
                   onClick={() => onStationSelect(station)}
                 >
                   <div className="flex items-start gap-2 sm:gap-3">
-                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-primary">
                       <Sunrise className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
