@@ -1,32 +1,21 @@
-import Link from 'next/link'
+'use client'
+
+import dynamic from 'next/dynamic'
+
+// Leafletはサーバーサイドでは動作しないためdynamic importを使用
+const StationMap = dynamic(() => import('@/components/StationMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-xl text-gray-600">地図を読み込み中...</div>
+    </div>
+  ),
+})
 
 export default function Home() {
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          Next.js Amplify Template
-        </h1>
-        <div className="text-center space-y-4">
-          <p className="text-lg text-gray-600">
-            AWS Amplifyにデプロイする準備ができたNext.jsテンプレートです。
-          </p>
-          <div className="flex justify-center space-x-4">
-            <Link 
-              href="/about" 
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Aboutページ
-            </Link>
-            <Link 
-              href="/map" 
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
-              沿岸駅マップ
-            </Link>
-          </div>
-        </div>
-      </div>
+    <main className="w-full h-screen">
+      <StationMap />
     </main>
   )
 }
