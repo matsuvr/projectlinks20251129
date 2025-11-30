@@ -3,10 +3,14 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm install 20
+        - nvm use 20
+        - node -v
         - npm ci
     build:
       commands:
         - npm run build
+        - ls -la out/
   artifacts:
     baseDirectory: out
     files:
