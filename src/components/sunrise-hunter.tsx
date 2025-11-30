@@ -11,13 +11,13 @@ import { convertFeatureToStation } from "@/lib/stations"
 export function SunriseHunter() {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true) // デフォルトで開く
   const [stations, setStations] = useState<Station[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // GeoJSONデータを読み込み
+  // GeoJSONデータをS3から読み込み
   useEffect(() => {
-    fetch('/data/stations_with_last_train.geojson')
+    fetch('https://project-links.s3.us-east-1.amazonaws.com/N02-22_Station_ese_coast_open_sea_with_trains.geojson')
       .then((res) => res.json())
       .then((data: StationGeoJSON) => {
         const convertedStations = data.features.map((feature, index) => 
@@ -64,10 +64,10 @@ export function SunriseHunter() {
       />
 
       <div className="relative flex flex-1 overflow-hidden">
-        {/* Sidebar */}
+        {/* Sidebar - デスクトップでは常に表示 */}
         <aside
-          className={`absolute left-0 top-0 z-20 h-full w-72 sm:w-80 transform bg-card transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
-            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          className={`absolute left-0 top-0 z-20 h-full w-72 sm:w-80 transform bg-card transition-transform duration-300 ease-in-out md:relative md:z-0 md:transform-none ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}
         >
           <StationList stations={stations} selectedStation={selectedStation} onStationSelect={handleStationSelect} />
