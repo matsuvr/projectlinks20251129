@@ -21,6 +21,7 @@ export interface Station {
   distanceToCoast: number // 沿岸からの距離(km)
   lastTrainArrival?: string // 最終列車到着時刻
   lastTrainInfo?: string // 最終列車情報
+  googleMapsUrl: string // Google MapsへのURL
 }
 
 // GeoJSON Feature型
@@ -44,18 +45,21 @@ export function convertFeatureToStation(feature: StationFeature, index: number):
   const coords = feature.geometry.coordinates
   const centerIndex = Math.floor(coords.length / 2)
   const centerCoord = coords[centerIndex]
+  const lat = centerCoord[1]
+  const lng = centerCoord[0]
   
   return {
     id: index + 1,
     name: feature.properties.N02_005,
     operator: feature.properties.N02_004,
     line: feature.properties.N02_003,
-    lat: centerCoord[1],
-    lng: centerCoord[0],
+    lat,
+    lng,
     distanceFromTokyo: feature.properties.distance_km_from_tokyo,
     distanceToCoast: feature.properties.distance_to_ese_coast_km,
     lastTrainArrival: feature.properties.last_train_arrival,
     lastTrainInfo: feature.properties.last_train_info,
+    googleMapsUrl: `https://www.google.com/maps?q=${lat},${lng}`,
   }
 }
 

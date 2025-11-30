@@ -1,6 +1,6 @@
 "use client"
 
-import { X, MapPin, Sunrise, Train, Clock } from "lucide-react"
+import { X, MapPin, Sunrise, Train, Clock, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Station } from "@/lib/stations"
 import { getDistanceCategory } from "@/lib/stations"
@@ -82,9 +82,16 @@ export function StationDetail({ station, isOpen, onClose }: StationDetailProps) 
           )}
 
           <div className="mt-3 sm:mt-4 flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground">
-            <span>
-              {station.lat.toFixed(4)}, {station.lng.toFixed(4)}
-            </span>
+            <a
+              href={station.googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-primary hover:underline"
+            >
+              <MapPin className="h-3 w-3" />
+              <span>Google Mapで開く</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
             <span className="rounded-full bg-secondary px-2 py-0.5 sm:py-1">{station.operator}</span>
           </div>
         </div>
