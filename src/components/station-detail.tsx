@@ -44,7 +44,7 @@ export function StationDetail({ station, isOpen, onClose }: StationDetailProps) 
   const creditData = imageInfo ? getImageCreditData(imageInfo) : null
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-30 max-h-[70vh] overflow-y-auto md:bottom-4 md:left-auto md:right-4 md:w-96 md:max-h-none animate-slide-in-up">
+    <div className="absolute bottom-0 left-0 right-0 z-30 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto overscroll-contain md:bottom-4 md:left-auto md:right-4 md:w-96 md:max-h-[calc(100vh-6rem)] animate-slide-in-up">
       <div className="rounded-t-2xl bg-card shadow-2xl md:rounded-2xl">
         {/* Header with Station Image */}
         <div className="relative h-32 sm:h-44 overflow-hidden rounded-t-2xl bg-linear-to-r from-primary/80 to-accent/80 md:rounded-t-2xl">
