@@ -1,3 +1,5 @@
+import { getSunrise2026NewYear, calculateWaitTime } from './sunrise'
+
 // 駅のプロパティ型（GeoJSONから読み込む生データ）
 export interface StationProperties {
   N02_003: string // 路線名
@@ -22,6 +24,8 @@ export interface Station {
   lastTrainArrival?: string // 最終列車到着時刻
   lastTrainInfo?: string // 最終列車情報
   googleMapsUrl: string // Google MapsへのURL
+  sunriseTime2026?: string // 2026年1月1日の日の出時刻
+  waitTimeToSunrise?: { hours: number; minutes: number } | null // 待機時間
 }
 
 // GeoJSON Feature型
@@ -48,6 +52,12 @@ export function convertFeatureToStation(feature: StationFeature, index: number):
   const lat = centerCoord[1]
   const lng = centerCoord[0]
   
+  // 2026年1月1日の日の出時刻を計算
+  const sunriseTime2026 = getSunrise2026NewYear(lat, lng)
+  const waitTimeToSunrise = feature.properties.last_train_arrival 
+    ? calculateWaitTime(feature.properties.last_train_arrival, sunriseTime2026)
+    : null
+  
   return {
     id: index + 1,
     name: feature.properties.N02_005,
@@ -60,6 +70,8 @@ export function convertFeatureToStation(feature: StationFeature, index: number):
     lastTrainArrival: feature.properties.last_train_arrival,
     lastTrainInfo: feature.properties.last_train_info,
     googleMapsUrl: `https://www.google.com/maps?q=${lat},${lng}`,
+    sunriseTime2026,
+    waitTimeToSunrise,
   }
 }
 

@@ -45,6 +45,11 @@ export function StationList({ stations, selectedStation, onStationSelect }: Stat
                         <span className="inline-flex items-center rounded-full bg-accent/20 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium text-accent">
                           沿岸{getDistanceCategory(station.distanceToCoast)}
                         </span>
+                        {station.sunriseTime2026 && (
+                          <span className="inline-flex items-center rounded-full bg-orange-500/20 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium text-orange-400">
+                            🌅 {station.sunriseTime2026}
+                          </span>
+                        )}
                         {station.lastTrainArrival && (
                           <span className="text-[10px] sm:text-xs text-muted-foreground">
                             🌙 {station.lastTrainArrival}

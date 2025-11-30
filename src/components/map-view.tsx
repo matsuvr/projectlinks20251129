@@ -326,8 +326,23 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
               onStationSelect(station)
             }}
           >
+            {/* パルスアニメーション（選択時または終電情報ありの駅） */}
+            {(selectedStation?.id === station.id || station.lastTrainArrival) && (
+              <div
+                className="absolute inset-0 -translate-x-1/2 -translate-y-1/2 rounded-full animate-marker-pulse"
+                style={{ 
+                  backgroundColor: getDistanceColor(station.distanceToCoast),
+                  width: '24px',
+                  height: '24px',
+                  left: '50%',
+                  top: '50%',
+                }}
+              />
+            )}
             <div
-              className="flex h-6 w-6 items-center justify-center rounded-full shadow-lg ring-2 ring-white"
+              className={`relative flex h-6 w-6 items-center justify-center rounded-full shadow-lg ring-2 ring-white ${
+                selectedStation?.id === station.id ? "animate-glow" : ""
+              }`}
               style={{ backgroundColor: getDistanceColor(station.distanceToCoast) }}
             >
               {station.lastTrainArrival && (
@@ -404,6 +419,7 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
 
       {/* Attribution */}
       <div className="absolute bottom-2 sm:bottom-4 left-1/2 z-20 -translate-x-1/2 transform rounded-lg bg-card/80 px-2 sm:px-3 py-1 text-[10px] sm:text-xs text-muted-foreground backdrop-blur-sm">
+        <span>地図: </span>
         <a 
           href="https://maps.gsi.go.jp/development/ichiran.html" 
           target="_blank" 
@@ -412,6 +428,17 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
         >
           地理院タイル
         </a>
+        <span className="mx-1">|</span>
+        <span>写真: </span>
+        <a 
+          href="https://commons.wikimedia.org/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:text-primary"
+        >
+          Wikimedia Commons
+        </a>
+        <span className="hidden sm:inline"> (CC BY-SA)</span>
       </div>
     </div>
   )

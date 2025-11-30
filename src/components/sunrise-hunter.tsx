@@ -46,10 +46,18 @@ export function SunriseHunter() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mb-4 text-4xl">🌅</div>
-          <p className="text-lg text-foreground">地図を読み込み中...</p>
-          <p className="text-sm text-muted-foreground mt-2">日の出撮影スポットを準備しています</p>
+        <div className="text-center animate-fade-in">
+          <div className="relative mb-4 inline-block">
+            <span className="text-6xl animate-bounce-slow">🌅</span>
+            <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl animate-pulse-slow" />
+          </div>
+          <p className="text-lg text-foreground font-bold">地図を読み込み中...</p>
+          <p className="text-sm text-muted-foreground mt-2">2026年元日の日の出撮影スポットを準備しています</p>
+          <div className="mt-4 flex justify-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
         </div>
       </div>
     )
