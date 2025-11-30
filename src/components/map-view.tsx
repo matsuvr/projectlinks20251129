@@ -17,12 +17,40 @@ interface MapViewProps {
 const KANTO_CENTER = { lat: 35.4, lng: 140.0 }
 const INITIAL_ZOOM = 9
 
+// タッチポイント間の距離を計算
+const getTouchDistance = (touches: React.TouchList) => {
+  if (touches.length < 2) return 0
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+// タッチポイントの中心を計算
+const getTouchCenter = (touches: React.TouchList) => {
+  if (touches.length < 2) {
+    return { x: touches[0].clientX, y: touches[0].clientY }
+  }
+  return {
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2,
+  }
+}
+
 export function MapView({ stations, onStationSelect, selectedStation }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const [zoom, setZoom] = useState(INITIAL_ZOOM)
   const [center, setCenter] = useState(KANTO_CENTER)
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef<{ x: number; y: number; lat: number; lng: number } | null>(null)
+  
+  // ピンチズーム用の状態
+  const pinchState = useRef<{
+    initialDistance: number
+    initialZoom: number
+    centerX: number
+    centerY: number
+  } | null>(null)
+  const [isPinching, setIsPinching] = useState(false)
 
   // Convert lat/lng to pixel position
   const latLngToPixel = useCallback(
@@ -86,6 +114,75 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
     setIsDragging(false)
     dragStart.current = null
     ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+  }
+
+  // タッチイベントハンドラ（ピンチズーム対応）
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      // ピンチズーム開始
+      e.preventDefault()
+      setIsPinching(true)
+      setIsDragging(false)
+      dragStart.current = null
+      
+      pinchState.current = {
+        initialDistance: getTouchDistance(e.touches),
+        initialZoom: zoom,
+        centerX: getTouchCenter(e.touches).x,
+        centerY: getTouchCenter(e.touches).y,
+      }
+    } else if (e.touches.length === 1) {
+      // シングルタッチでドラッグ
+      if (!isPinching) {
+        setIsDragging(true)
+        dragStart.current = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+          lat: center.lat,
+          lng: center.lng,
+        }
+      }
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchState.current) {
+      // ピンチズーム中
+      e.preventDefault()
+      const currentDistance = getTouchDistance(e.touches)
+      const scale = currentDistance / pinchState.current.initialDistance
+      const newZoom = Math.max(5, Math.min(18, pinchState.current.initialZoom + Math.log2(scale)))
+      setZoom(Math.round(newZoom * 10) / 10) // 0.1単位で丸める
+    } else if (e.touches.length === 1 && isDragging && dragStart.current && !isPinching) {
+      // シングルタッチでドラッグ
+      const dx = e.touches[0].clientX - dragStart.current.x
+      const dy = e.touches[0].clientY - dragStart.current.y
+      const scale = Math.pow(2, zoom)
+
+      const dLng = (-dx / (256 * scale)) * 360
+      const dLat = (dy / (256 * scale)) * 180
+
+      setCenter({
+        lat: Math.max(-85, Math.min(85, dragStart.current.lat + dLat)),
+        lng: dragStart.current.lng + dLng,
+      })
+    }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      // ピンチズーム終了
+      if (isPinching) {
+        setIsPinching(false)
+        pinchState.current = null
+        // ズームを整数に丸める
+        setZoom((z) => Math.round(z))
+      }
+    }
+    if (e.touches.length === 0) {
+      setIsDragging(false)
+      dragStart.current = null
+    }
   }
 
   // Handle wheel zoom
@@ -192,6 +289,10 @@ export function MapView({ stations, onStationSelect, selectedStation }: MapViewP
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
         onWheel={handleWheel}
         style={{ touchAction: "none" }}
       >
